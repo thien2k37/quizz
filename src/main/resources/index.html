@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-12 mt-3">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="#">Navbar</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Link</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+                                Dropdown
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled">Disabled</a>
+                        </li>
+                    </ul>
+                    <div class="form-inline my-2 my-lg-0">
+                        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="content">
+                        <button class="btn btn-outline-success my-2 my-sm-0" onclick="searchContent()">Search</button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <table class="table">
+                <thead>
+                <h3 style="text-align: center">Danh sách câu hỏi</h3>
+                <tr>
+                    <th scope="col">Stt</th>
+                    <th scope="col">Câu hỏi </th>
+                    <th scope="col">Tra loi</th>
+                </tr>
+                </thead>
+                <tbody id="question">
+
+                </tbody>
+            </table>
+        </div>
+        <div class="col-8" id="main">
+            <table class="table">
+                <thead>
+                <h3 style="text-align: center">Chọn câu trả lời</h3>
+                </thead>
+                <div id="displayQuestion">
+
+                </div>
+                <tbody id="showAnswer">
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    let show = document.getElementById("question");
+    let showAnswer = document.getElementById("showAnswer");
+    $.ajax({
+        type: "GET",
+        url: "http://localhost:8080/question",
+        success: function (question) {
+            showQuestion(question)
+        }, error: function (error) {
+            console.log(error);
+        }
+    })
+    function showQuestion(question) {
+        let str = ""
+        for (let i = 0; i < question.length; i++) {
+            str += `<tr>
+                                <th scope="row">${i + 1}</th>
+                                <td><a class="dropdown-item" style="color: black; font-size: 20px" href="#" onclick="clickShowAnswer(${question[i].id})">${question[i].content} ?</a></td>
+                                <th scope="row" class="nav-link" onclick="showAnswerModal(${question[i].id})">xem</th>
+                            </tr>`
+        }
+        show.innerHTML = str;
+    }
+    function clickShowAnswer(id) {
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:8080/answer/question/" + id,
+            success: function (question) {
+                for (let i = 0; i < question.length; i++) {
+                    if (question[i].question_id.type == 1) {
+                        displayRadio(question)
+                    }else {
+                        displayCheckbox(question)
+                    }
+                }
+            }, error: function (error) {
+                console.log(error);
+            }
+        })
+    }
+    function displayCheckbox(question) {
+        let str = "<th>Chọn nhiều đáp án</th>\n"
+        let displayQuestion = document.getElementById("displayQuestion");
+        let string = "ABCD"
+        for (let i = 0; i < question.length; i++) {
+            str += `<tr>
+                        <th scope="row"><input type="checkbox" name="abcd" value="${question[i].isTrue}"> ${string.charAt(i)}</th>
+                        <th scope="row">${question[i].name}</th>
+
+                    </tr>`
+        }
+        let stringQuestion = ""
+        for (let i = 0; i < question.length; i++) {
+            stringQuestion += `<h3 scope="row">${question[i].question_id.content} ?</h3>`
+            break;
+        }
+        displayQuestion.innerHTML = stringQuestion;
+        showAnswer.innerHTML = str;
+    }
+    function displayRadio(question) {
+        let str = "<th>Chọn đáp án đúng nhất</th>\n"
+        let displayQuestion = document.getElementById("displayQuestion");
+        let string = "ABCD"
+        for (let i = 0; i < question.length; i++) {
+            str += `<tr>
+                        <th scope="row"><input type="radio" name="abcd" value="${question[i].isTrue}"> ${string.charAt(i)}</th>
+                        <th scope="row">${question[i].name}</th>
+
+                    </tr>`
+        }
+        let stringQuestion = ""
+        for (let i = 0; i < question.length; i++) {
+            stringQuestion += `<h3 scope="row">${question[i].question_id.content} ?</h3>`
+            break;
+        }
+        displayQuestion.innerHTML = stringQuestion;
+        showAnswer.innerHTML = str;
+    }
+    function searchContent() {
+        let content = document.getElementById("content");
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:8080/question/search-by-content?content=" + content.value,
+            success: function (content) {
+                console.log(content)
+                showQuestion(content)
+            }, error: function (error) {
+                console.log(error);
+            }
+        })
+    }
+    function showAnswerModal(id) {
+        let showModal = document.getElementById("showModal")
+        let exampleModalLabel = document.getElementById("exampleModalLabel");
+        $('#exampleModal').modal('show')
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:8080/answer/question/" + id,
+            success: function (question) {
+                let str = ""
+                let string = "ABCD"
+                for (let i = 0; i < question.length; i++) {
+                    str += `<tr style="text-align: center">
+                                 <th scope="row"><input type="radio" name="abcd" value="${question[i].isTrue}"> ${string.charAt(i)}</th>
+                                 <th scope="row">${question[i].name}</th>
+
+                            </tr>`
+                }
+                let stringQuestion = ""
+                for (let i = 0; i < question.length; i++) {
+                    stringQuestion += `<th scope="row">${question[i].question_id.content} ?</th>`
+                    break;
+                }
+                exampleModalLabel.innerHTML = stringQuestion;
+                showModal.innerHTML = str;
+            }, error: function (error) {
+                console.log(error);
+            }
+        })
+    }
+    function checkAnswer() {
+        let message = document.getElementById("message")
+        let checkbox = document.getElementsByName("abcd");
+        message.innerHTML =  "sai rôi";
+        for (let i = 0; i < checkbox.length; i++){
+            if (checkbox[i].checked === true){
+                if (checkbox[i].value == 0) {
+                    message.innerHTML = "đúng rồi";
+                    break
+                }
+            }
+        }
+
+    }
+</script>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <table class="modal-body" id="showModal">
+
+            </table>
+            <h4 id="message"></h4>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="checkAnswer()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
