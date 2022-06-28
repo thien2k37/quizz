@@ -81,11 +81,11 @@
             <table  class="table">
                 <tr>
                     <th><input type="button" onclick="back()" value="<<<"></th>
-                    <th style="text-align: right"> <input type="button" onclick="next()" value=">>>"></th>
+                    <th style="text-align: right"> <input type="button" onclick="" value=">>>"></th>
                 </tr>
                 <tr>
-                    <th><input type="submit" value="nộp bài"></th>
-                    <th>Kết quả</th>
+                    <th><input type="submit" value="nộp bài" onclick="submitAnswer()"></th>
+                    <th id="kq">Kết quả</th>
                 </tr>
             </table>
         </div>
@@ -114,6 +114,7 @@
         }
         show.innerHTML = str;
     }
+
     function clickShowAnswer(id) {
         $.ajax({
             type: "GET",
@@ -157,13 +158,13 @@
         for (let i = 0; i < question.length; i++) {
             str += `<tr>
                         <th scope="row"><input type="radio" name="abcd" value="${question[i].isTrue}"> ${string.charAt(i)}</th>
-                        <th scope="row">${question[i].name}</th>
+                        <th scope="row">${question[i].name}></th>
 
                     </tr>`
         }
         let stringQuestion = ""
         for (let i = 0; i < question.length; i++) {
-            stringQuestion += `<h3 scope="row">${question[i].question_id.content} ?</h3>`
+            stringQuestion += `<h3 scope="row">${question[i].question_id.content} ? <input type="hidden" id="idQuestion" value="${question[i].question_id.id}"</h3>`
             break;
         }
         displayQuestion.innerHTML = stringQuestion;
@@ -223,6 +224,23 @@
             }
         }
 
+    }
+    let a = 0;
+    function submitAnswer() {
+        let count = document.getElementById("kq");
+        let idQuestion = document.getElementById("idQuestion").value;
+        let checkbox = document.getElementsByName("abcd");
+        for (let i = 0; i < checkbox.length; i++){
+            if (checkbox[i].checked === true){
+                if (checkbox[i].value == 0) {
+                    a++;
+                }else {
+                    a--;
+                }
+            }
+        }
+        count.innerText = `${a}`;
+        clickShowAnswer(Number(idQuestion) + 1)
     }
 </script>
 <!-- Modal -->
