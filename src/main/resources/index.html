@@ -75,8 +75,18 @@
                 </div>
                 <tbody id="showAnswer">
 
-
                 </tbody>
+
+            </table>
+            <table  class="table">
+                <tr>
+                    <th><input type="button" onclick="back()" value="<<<"></th>
+                    <th style="text-align: right"> <input type="button" onclick="next()" value=">>>"></th>
+                </tr>
+                <tr>
+                    <th><input type="submit" value="nộp bài"></th>
+                    <th>Kết quả</th>
+                </tr>
             </table>
         </div>
     </div>
@@ -141,7 +151,7 @@
         showAnswer.innerHTML = str;
     }
     function displayRadio(question) {
-        let str = "<th>Chọn đáp án đúng nhất</th>\n"
+        let str = "<th>Chọn 1 đáp án</th>\n"
         let displayQuestion = document.getElementById("displayQuestion");
         let string = "ABCD"
         for (let i = 0; i < question.length; i++) {
@@ -186,7 +196,6 @@
                     str += `<tr style="text-align: center">
                                  <th scope="row"><input type="radio" name="abcd" value="${question[i].isTrue}"> ${string.charAt(i)}</th>
                                  <th scope="row">${question[i].name}</th>
-
                             </tr>`
                 }
                 let stringQuestion = ""
